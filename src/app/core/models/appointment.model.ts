@@ -14,9 +14,8 @@ export interface AppointmentDraft {
 }
 
 export const SERVICE_OPTIONS: string[] = [
-  'Troca de oleo',
-  'Alinhamento',
-  'Balanceamento',
-  'Lavagem tecnica',
-  'Revisao geral'
+  'Colocacao de taximetro',
+  'Retirada de taximetro',
+  'Marcador combustivel',
+  'Marcador temperatura'
 ];

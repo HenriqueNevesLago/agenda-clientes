@@ -17,7 +17,7 @@ import { DayFilterComponent } from './components/day-filter/day-filter.component
   styleUrl: './scheduling-page.component.css'
 })
 export class SchedulingPageComponent {
-  protected readonly serviceOptions = SERVICE_OPTIONS;
+  protected serviceOptions = [...SERVICE_OPTIONS];
 
   protected readonly form: AppointmentDraft = {
     name: '',
@@ -68,6 +68,26 @@ export class SchedulingPageComponent {
 
   protected get backendError(): string {
     return this.store.getSyncError();
+  }
+
+  protected addServiceType(serviceTypeName: string): void {
+    const normalized = serviceTypeName.trim();
+    if (!normalized) {
+      return;
+    }
+
+    const hasExisting = this.serviceOptions.some(
+      (service) => service.toLowerCase() === normalized.toLowerCase()
+    );
+
+    if (hasExisting) {
+      this.formError = 'Esse tipo de servico ja existe.';
+      return;
+    }
+
+    this.serviceOptions = [...this.serviceOptions, normalized];
+    this.form.serviceType = normalized;
+    this.formError = '';
   }
 
   protected async saveAppointment(): Promise<void> {

@@ -16,4 +16,27 @@ export class AppointmentFormComponent {
 
   @Output() public save = new EventEmitter<void>();
   @Output() public reset = new EventEmitter<void>();
+  @Output() public addServiceType = new EventEmitter<string>();
+
+  protected isAddingServiceType = false;
+  protected newServiceTypeName = '';
+
+  protected openServiceTypeEditor(): void {
+    this.isAddingServiceType = true;
+  }
+
+  protected cancelServiceTypeEditor(): void {
+    this.isAddingServiceType = false;
+    this.newServiceTypeName = '';
+  }
+
+  protected confirmServiceType(): void {
+    const normalized = this.newServiceTypeName.trim();
+    if (!normalized) {
+      return;
+    }
+
+    this.addServiceType.emit(normalized);
+    this.cancelServiceTypeEditor();
+  }
 }

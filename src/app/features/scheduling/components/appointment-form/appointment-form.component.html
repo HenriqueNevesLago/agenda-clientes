@@ -24,7 +24,31 @@
   </label>
 
   <label>
-    Tipo de servico
+    <span class="label-row">
+      Tipo de servico
+      <button
+        type="button"
+        class="service-plus"
+        (click)="openServiceTypeEditor()"
+        aria-label="Adicionar novo tipo de servico"
+      >
+        +
+      </button>
+    </span>
+
+    @if (isAddingServiceType) {
+      <span class="service-editor">
+        <input
+          type="text"
+          name="newServiceType"
+          [(ngModel)]="newServiceTypeName"
+          placeholder="Novo tipo de servico"
+        />
+        <button type="button" class="ghost" (click)="confirmServiceType()">Adicionar</button>
+        <button type="button" class="ghost" (click)="cancelServiceTypeEditor()">Cancelar</button>
+      </span>
+    }
+
     <select name="serviceType" [(ngModel)]="model.serviceType" required>
       @for (service of serviceOptions; track service) {
         <option [value]="service">{{ service }}</option>

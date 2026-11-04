@@ -18,6 +18,7 @@
         [serviceOptions]="serviceOptions"
         [isEditing]="isEditing"
         [formError]="formError"
+        (addServiceType)="addServiceType($event)"
         (save)="saveAppointment()"
         (reset)="resetForm()"
       />
