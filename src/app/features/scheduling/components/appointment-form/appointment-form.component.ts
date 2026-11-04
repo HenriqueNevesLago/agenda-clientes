@@ -22,6 +22,15 @@ export class AppointmentFormComponent {
 
   protected isAddingServiceType = false;
   protected newServiceTypeName = '';
+  protected readonly timeSlots = this.buildTimeSlots();
+
+  protected get datePart(): string {
+    return this.model.dateTime?.split('T')[0] ?? '';
+  }
+
+  protected get timePart(): string {
+    return this.model.dateTime?.split('T')[1] ?? '';
+  }
 
   protected openServiceTypeEditor(): void {
     this.isAddingServiceType = true;
@@ -44,5 +53,37 @@ export class AppointmentFormComponent {
 
   protected onPhoneInput(value: string): void {
     this.phoneChange.emit(value);
+  }
+
+  protected onDatePartChange(datePart: string): void {
+    this.composeDateTime(datePart, this.timePart);
+  }
+
+  protected onTimePartChange(timePart: string): void {
+    this.composeDateTime(this.datePart, timePart);
+  }
+
+  private composeDateTime(datePart: string, timePart: string): void {
+    if (!datePart || !timePart) {
+      this.model.dateTime = '';
+      return;
+    }
+
+    this.model.dateTime = `${datePart}T${timePart}`;
+  }
+
+  private buildTimeSlots(): string[] {
+    const slots: string[] = [];
+
+    for (let hour = 8; hour <= 17; hour += 1) {
+      const hourLabel = String(hour).padStart(2, '0');
+      slots.push(`${hourLabel}:00`);
+
+      if (hour < 17) {
+        slots.push(`${hourLabel}:30`);
+      }
+    }
+
+    return slots;
   }
 }

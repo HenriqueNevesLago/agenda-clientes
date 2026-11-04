@@ -35,6 +35,16 @@
   </label>
 
   <label>
+    Nota (opcional)
+    <textarea
+      name="note"
+      [(ngModel)]="model.note"
+      placeholder="Observacoes do atendimento"
+      rows="3"
+    ></textarea>
+  </label>
+
+  <label>
     Tipo de servico
     <span class="service-select-row">
       <select name="serviceType" [(ngModel)]="model.serviceType" required>
@@ -70,7 +80,26 @@
 
   <label>
     Data e hora
-    <input type="datetime-local" name="dateTime" [(ngModel)]="model.dateTime" required />
+    <span class="date-time-row">
+      <input
+        type="date"
+        name="datePart"
+        [ngModel]="datePart"
+        (ngModelChange)="onDatePartChange($event)"
+        required
+      />
+      <select
+        name="timePart"
+        [ngModel]="timePart"
+        (ngModelChange)="onTimePartChange($event)"
+        required
+      >
+        <option value="">Selecione o horario</option>
+        @for (slot of timeSlots; track slot) {
+          <option [value]="slot">{{ slot }}</option>
+        }
+      </select>
+    </span>
   </label>
 
   @if (formError) {

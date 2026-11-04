@@ -125,6 +125,7 @@ export class AppointmentStoreService {
             id: snapshotDoc.id,
             name: data.name,
             phone: typeof data.phone === 'string' ? data.phone : '',
+            note: typeof data.note === 'string' ? data.note : '',
             car: data.car,
             serviceType: data.serviceType,
             dateTime: data.dateTime
@@ -194,6 +195,7 @@ export class AppointmentStoreService {
     return {
       name: payload.name.trim(),
       phone: payload.phone.trim(),
+      note: payload.note.trim(),
       car: payload.car.trim(),
       serviceType: payload.serviceType,
       dateTime: payload.dateTime
@@ -210,6 +212,7 @@ export class AppointmentStoreService {
     return (
       typeof candidate.name === 'string' &&
       (typeof candidate.phone === 'string' || typeof (candidate as { phone?: unknown }).phone === 'undefined') &&
+      (typeof candidate.note === 'string' || typeof (candidate as { note?: unknown }).note === 'undefined') &&
       typeof candidate.car === 'string' &&
       typeof candidate.serviceType === 'string' &&
       typeof candidate.dateTime === 'string'

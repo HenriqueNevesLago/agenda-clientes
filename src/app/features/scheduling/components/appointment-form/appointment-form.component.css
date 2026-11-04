@@ -45,6 +45,12 @@ label {
   align-items: center;
 }
 
+.date-time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
 .service-editor {
   display: grid;
   gap: 0.4rem;
@@ -60,17 +66,24 @@ label {
 }
 
 input,
+textarea,
 select,
 button {
   font: inherit;
 }
 
 input,
+textarea,
 select {
   border: 1px solid #cad7e3;
   border-radius: 10px;
   padding: 0.58rem 0.7rem;
   background: #fff;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 4.5rem;
 }
 
 select {
@@ -87,6 +100,7 @@ select {
 }
 
 input:focus,
+textarea:focus,
 select:focus {
   outline: 2px solid #59a5ff59;
   border-color: #4b9af9;
@@ -125,4 +139,10 @@ button:disabled {
   margin: 0;
   color: #b42323;
   font-size: 0.85rem;
+}
+
+@media (max-width: 580px) {
+  .date-time-row {
+    grid-template-columns: 1fr;
+  }
 }

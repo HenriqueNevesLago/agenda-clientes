@@ -6,6 +6,9 @@
         <p class="client">{{ item.name || 'Cliente sem nome' }}</p>
         <p>{{ item.phone }}</p>
         <p>{{ item.car }}</p>
+        @if (item.note) {
+          <p>{{ item.note }}</p>
+        }
         <p>{{ item.serviceType }}</p>
         <small>{{ formatDateTime(item.dateTime) }}</small>
         <div class="row-actions">

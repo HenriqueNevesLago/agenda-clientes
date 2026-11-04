@@ -20,9 +20,10 @@ export class SchedulingPageComponent {
   protected readonly form: AppointmentDraft = {
     name: '',
     phone: '',
+    note: '',
     car: '',
     serviceType: SERVICE_OPTIONS[0],
-    dateTime: ''
+    dateTime: this.buildDefaultDateTime()
   };
 
   protected selectedDate = '';
@@ -121,6 +122,12 @@ export class SchedulingPageComponent {
       return;
     }
 
+    if (!this.isValidTimeSlot(this.form.dateTime)) {
+      this.formError =
+        'Use horarios de 30 em 30 minutos entre 08:00 e 17:00 (ex.: 14:00, 14:30).';
+      return;
+    }
+
     const normalizedDateTime = this.form.dateTime;
     if (this.store.hasConflict(normalizedDateTime, this.editingId)) {
       this.formError = 'Ja existe um agendamento para esse horario.';
@@ -163,6 +170,7 @@ export class SchedulingPageComponent {
     this.editingId = item.id;
     this.form.name = item.name;
     this.form.phone = item.phone || '';
+    this.form.note = item.note || '';
     this.form.car = item.car;
     this.form.serviceType = item.serviceType;
     this.form.dateTime = item.dateTime;
@@ -206,9 +214,10 @@ export class SchedulingPageComponent {
     this.editingId = null;
     this.form.name = '';
     this.form.phone = '';
+    this.form.note = '';
     this.form.car = '';
     this.form.serviceType = this.serviceOptions[0] ?? SERVICE_OPTIONS[0];
-    this.form.dateTime = '';
+    this.form.dateTime = this.buildDefaultDateTime();
     this.formError = '';
     this.isSaving = false;
   }
@@ -244,6 +253,60 @@ export class SchedulingPageComponent {
     }
 
     return `(${ddd}) ${remaining.slice(0, 5)}-${remaining.slice(5)}`;
+  }
+
+  private isValidTimeSlot(dateTime: string): boolean {
+    const match = dateTime.match(/T(\d{2}):(\d{2})/);
+    if (!match) {
+      return false;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (!Number.isInteger(hours) || !Number.isInteger(minutes)) {
+      return false;
+    }
+
+    if (hours < 8 || hours > 17) {
+      return false;
+    }
+
+    if (hours === 17) {
+      return minutes === 0;
+    }
+
+    return minutes === 0 || minutes === 30;
+  }
+
+  private buildDefaultDateTime(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+
+    const totalMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const openingMinutes = 8 * 60;
+    const closingMinutes = 17 * 60;
+
+    let slotMinutes: number;
+
+    if (totalMinutes <= openingMinutes) {
+      slotMinutes = openingMinutes;
+    } else if (totalMinutes >= closingMinutes) {
+      slotMinutes = closingMinutes;
+    } else {
+      slotMinutes = Math.ceil(totalMinutes / 30) * 30;
+      if (slotMinutes > closingMinutes) {
+        slotMinutes = closingMinutes;
+      }
+    }
+
+    const hour = String(Math.floor(slotMinutes / 60)).padStart(2, '0');
+    const minute = String(slotMinutes % 60).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hour}:${minute}`;
   }
 
   private toDateKey(dateTime: string): string {
