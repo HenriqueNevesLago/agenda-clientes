@@ -11,6 +11,7 @@ export class AppointmentListComponent {
 
   @Output() public edit = new EventEmitter<Appointment>();
   @Output() public remove = new EventEmitter<string>();
+  @Output() public conclude = new EventEmitter<string>();
 
   protected trackById(_: number, item: Appointment): string {
     return item.id;

@@ -1,5 +1,6 @@
 export interface Appointment {
   id: string;
+  completed: boolean;
   name: string;
   phone: string;
   note: string;
@@ -18,8 +19,8 @@ export interface AppointmentDraft {
 }
 
 export const SERVICE_OPTIONS: string[] = [
-  'Colocacao de taximetro',
-  'Retirada de taximetro',
-  'Marcador combustivel',
-  'Marcador temperatura'
+  'Colocação de taxímetro',
+  'Retirada de taxímetro',
+  'Marcador de combustível',
+  'Marcador de temperatura'
 ];

@@ -20,6 +20,11 @@ button {
   color: #a12727;
 }
 
+.success {
+  background: #e5faea;
+  color: #156c2d;
+}
+
 .timeline {
   list-style: none;
   margin: 0;
@@ -49,6 +54,16 @@ button {
   padding: 0.7rem;
 }
 
+.card.completed {
+  border-color: #b7efc5;
+  border-left-color: #28a745;
+  box-shadow: inset 0 0 0 1px #81d89c;
+}
+
+.completed-tag-container {
+  margin: 0 10px 0 0;
+}
+
 .card p,
 .card small {
   margin: 0;
@@ -63,6 +78,14 @@ button {
 .client {
   font-weight: 700;
   color: #1f2f48;
+}
+
+.completed-tag {
+  display: inline-block;
+  margin-top: 0.2rem;
+  margin-right: 0.4rem;
+  color: #1c7d36;
+  font-weight: 700;
 }
 
 .row-actions {

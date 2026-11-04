@@ -3,7 +3,7 @@
     <p class="eyebrow">Painel de Atendimento</p>
     <h1>Agenda de Clientes</h1>
     <p>
-      Organize horarios de servico em uma agenda visual por dia. Dados salvos no
+      Organize horários de serviço em uma agenda visual por dia. Dados salvos no
       Firestore em tempo real.
     </p>
     @if (backendError) {
@@ -27,7 +27,7 @@
     </article>
 
     <article class="panel agenda-panel">
-      <h2>Visao inteligente da agenda</h2>
+      <h2>Visão inteligente da agenda</h2>
 
       <app-day-filter
         [availableDays]="availableDays"
@@ -38,11 +38,12 @@
       />
 
       @if (selectedDayAppointments.length === 0) {
-        <p class="empty-state">Nao ha agendamentos para o filtro atual.</p>
+        <p class="empty-state">Não há agendamentos para o filtro atual.</p>
       } @else {
         <app-appointment-list
           [appointments]="selectedDayAppointments"
           (edit)="editAppointment($event)"
+          (conclude)="concludeAppointment($event)"
           (remove)="deleteAppointment($event)"
         />
       }

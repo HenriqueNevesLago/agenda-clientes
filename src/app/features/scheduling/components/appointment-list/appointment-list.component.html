@@ -2,17 +2,27 @@
   @for (item of appointments; track trackById($index, item)) {
     <li>
       <div class="hour">{{ formatTime(item.dateTime) }}</div>
-      <div class="card">
+      <div class="card" [class.completed]="item.completed">
         <p class="client">{{ item.name || 'Cliente sem nome' }}</p>
-        <p>{{ item.phone }}</p>
+        @if (item.phone) {
+          <p>{{ item.phone }}</p>
+        }
         <p>{{ item.car }}</p>
         @if (item.note) {
           <p>{{ item.note }}</p>
         }
         <p>{{ item.serviceType }}</p>
+        @if (item.completed) {
+          <div class="completed-tag-container">
+          <small class="completed-tag">Concluído</small>
+          </div>
+        }
         <small>{{ formatDateTime(item.dateTime) }}</small>
         <div class="row-actions">
           <button type="button" class="ghost" (click)="edit.emit(item)">Editar</button>
+          @if (!item.completed) {
+            <button type="button" class="success" (click)="conclude.emit(item.id)">Concluir</button>
+          }
           <button type="button" class="danger" (click)="remove.emit(item.id)">Excluir</button>
         </div>
       </div>

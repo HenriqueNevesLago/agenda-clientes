@@ -45,7 +45,7 @@
     <textarea
       name="note"
       [(ngModel)]="model.note"
-      placeholder="Observacoes do atendimento"
+      placeholder="Observações do atendimento"
       rows="3"
       maxlength="300"
       enterkeyhint="done"
@@ -53,7 +53,7 @@
   </label>
 
   <label>
-    Tipo de servico
+    Tipo de serviço
     <span class="service-select-row">
       <select name="serviceType" [(ngModel)]="model.serviceType" required>
         @for (service of serviceOptions; track service) {
@@ -64,7 +64,7 @@
         type="button"
         class="service-plus"
         (click)="openServiceTypeEditor()"
-        aria-label="Adicionar novo tipo de servico"
+        aria-label="Adicionar novo tipo de serviço"
       >
         +
       </button>
@@ -77,7 +77,7 @@
         type="text"
         name="newServiceType"
         [(ngModel)]="newServiceTypeName"
-        placeholder="Novo tipo de servico"
+        placeholder="Novo tipo de serviço"
       />
       <div class="service-editor-actions">
         <button type="button" class="ghost" (click)="confirmServiceType()">Adicionar</button>
@@ -102,7 +102,7 @@
         (ngModelChange)="onTimePartChange($event)"
         required
       >
-        <option value="">Selecione o horario</option>
+        <option value="">Selecione o horário</option>
         @for (slot of timeSlots; track slot) {
           <option [value]="slot">{{ slot }}</option>
         }
@@ -116,7 +116,7 @@
 
   <div class="actions">
     <button class="primary" type="submit" [disabled]="isSaving">
-      {{ isSaving ? (isEditing ? 'Salvando...' : 'Agendando...') : (isEditing ? 'Salvar alteracao' : 'Agendar horario') }}
+      {{ isSaving ? (isEditing ? 'Salvando...' : 'Agendando...') : (isEditing ? 'Salvar alteração' : 'Agendar horário') }}
     </button>
     @if (isEditing) {
       <button type="button" class="ghost" (click)="reset.emit()" [disabled]="isSaving">

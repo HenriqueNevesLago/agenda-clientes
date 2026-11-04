@@ -80,7 +80,10 @@ export class AppointmentStoreService {
     this.assertFirestoreConfigured();
     const collectionRef = collection(this.firestore!, 'appointments');
     this.syncErrorSignal.set('');
-    await addDoc(collectionRef, this.toDocument(payload));
+    await addDoc(collectionRef, {
+      ...this.toDocument(payload),
+      completed: false
+    });
   }
 
   public async update(id: string, payload: AppointmentDraft): Promise<boolean> {
@@ -104,6 +107,20 @@ export class AppointmentStoreService {
     await deleteDoc(appointmentRef);
   }
 
+  public async conclude(id: string): Promise<boolean> {
+    this.assertFirestoreConfigured();
+    this.syncErrorSignal.set('');
+
+    const exists = this.appointmentsSignal().some((item) => item.id === id);
+    if (!exists) {
+      return false;
+    }
+
+    const appointmentRef = doc(this.firestore!, 'appointments', id);
+    await setDoc(appointmentRef, { completed: true }, { merge: true });
+    return true;
+  }
+
   private bindAppointments(): void {
     const collectionRef = collection(this.firestore!, 'appointments');
     const appointmentsQuery = query(collectionRef, orderBy('dateTime', 'asc'));
@@ -123,6 +140,7 @@ export class AppointmentStoreService {
 
           nextState.push({
             id: snapshotDoc.id,
+            completed: (data as { completed?: unknown }).completed === true,
             name: data.name,
             phone: typeof data.phone === 'string' ? data.phone : '',
             note: typeof data.note === 'string' ? data.note : '',
@@ -184,7 +202,7 @@ export class AppointmentStoreService {
       const code = String(error.code);
 
       if (code.includes('permission-denied')) {
-        return 'Firestore bloqueou o acesso. Ajuste as regras de leitura/escrita da colecao appointments.';
+        return 'Firestore bloqueou o acesso. Ajuste as regras de leitura e escrita da coleção appointments.';
       }
     }
 

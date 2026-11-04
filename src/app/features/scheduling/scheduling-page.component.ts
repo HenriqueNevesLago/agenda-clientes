@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   Appointment,
   AppointmentDraft,
@@ -29,7 +29,7 @@ export class SchedulingPageComponent {
   protected selectedDate = '';
   protected editingId: string | null = null;
   protected formError = '';
-  protected isSaving = false;
+  private readonly savingSignal = signal(false);
 
   private readonly store = inject(AppointmentStoreService);
 
@@ -75,6 +75,10 @@ export class SchedulingPageComponent {
     return this.store.getSyncError();
   }
 
+  protected get isSaving(): boolean {
+    return this.savingSignal();
+  }
+
   protected async addServiceType(serviceTypeName: string): Promise<void> {
     const normalized = serviceTypeName.trim();
     if (!normalized) {
@@ -86,21 +90,21 @@ export class SchedulingPageComponent {
     );
 
     if (hasExisting) {
-      this.formError = 'Esse tipo de servico ja existe.';
+      this.formError = 'Esse tipo de serviço já existe.';
       return;
     }
 
     try {
       const created = await this.store.createServiceType(normalized);
       if (!created) {
-        this.formError = 'Esse tipo de servico ja existe.';
+        this.formError = 'Esse tipo de serviço já existe.';
         return;
       }
 
       this.form.serviceType = normalized;
       this.formError = '';
     } catch {
-      this.formError = 'Nao foi possivel salvar o tipo de servico no Firestore.';
+      this.formError = 'Não foi possível salvar o tipo de serviço no Firestore.';
     }
   }
 
@@ -113,29 +117,29 @@ export class SchedulingPageComponent {
     const normalizedPhone = this.onlyDigits(this.form.phone);
 
     if (!this.form.car || !this.form.serviceType || !this.form.dateTime) {
-      this.formError = 'Preencha carro, servico e data antes de salvar.';
+      this.formError = 'Preencha carro, serviço e data antes de salvar.';
       return;
     }
 
     if (normalizedPhone.length > 0 && normalizedPhone.length < 10) {
-      this.formError = 'Se informar celular, preencha um numero valido.';
+      this.formError = 'Se informar celular, preencha um número válido.';
       return;
     }
 
     if (!this.isValidTimeSlot(this.form.dateTime)) {
       this.formError =
-        'Use horarios de 30 em 30 minutos entre 08:00 e 17:00 (ex.: 14:00, 14:30).';
+        'Use horários de 30 em 30 minutos entre 08:00 e 17:00 (ex.: 14:00, 14:30).';
       return;
     }
 
     const normalizedDateTime = this.form.dateTime;
     if (this.store.hasConflict(normalizedDateTime, this.editingId)) {
-      this.formError = 'Ja existe um agendamento para esse horario.';
+      this.formError = 'Já existe um agendamento para esse horário.';
       return;
     }
 
     try {
-      this.isSaving = true;
+      this.savingSignal.set(true);
 
       if (this.editingId !== null) {
         const updated = await this.store.update(this.editingId, {
@@ -145,7 +149,7 @@ export class SchedulingPageComponent {
         });
 
         if (!updated) {
-          this.formError = 'Nao foi possivel atualizar o agendamento.';
+          this.formError = 'Não foi possível atualizar o agendamento.';
           return;
         }
       } else {
@@ -160,9 +164,9 @@ export class SchedulingPageComponent {
       this.resetForm();
     } catch {
       this.formError =
-        'Nao foi possivel salvar no Firestore. Verifique as regras de permissao da colecao appointments.';
+        'Não foi possível salvar no Firestore. Verifique as regras de permissão da coleção appointments.';
     } finally {
-      this.isSaving = false;
+      this.savingSignal.set(false);
     }
   }
 
@@ -198,7 +202,19 @@ export class SchedulingPageComponent {
       }
     } catch {
       this.formError =
-        'Nao foi possivel excluir no Firestore. Verifique as regras de permissao da colecao appointments.';
+        'Não foi possível excluir no Firestore. Verifique as regras de permissão da coleção appointments.';
+    }
+  }
+
+  protected async concludeAppointment(id: string): Promise<void> {
+    try {
+      const updated = await this.store.conclude(id);
+      if (!updated) {
+        this.formError = 'Não foi possível concluir o agendamento.';
+      }
+    } catch {
+      this.formError =
+        'Não foi possível concluir no Firestore. Verifique as regras de permissão da coleção appointments.';
     }
   }
 
@@ -219,7 +235,7 @@ export class SchedulingPageComponent {
     this.form.serviceType = this.serviceOptions[0] ?? SERVICE_OPTIONS[0];
     this.form.dateTime = this.buildDefaultDateTime();
     this.formError = '';
-    this.isSaving = false;
+    this.savingSignal.set(false);
   }
 
   protected updatePhone(maskedPhone: string): void {
