@@ -13,13 +13,14 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { FIREBASE_CONFIG, hasFirebaseConfig } from '../config/firebase.config';
-import { Appointment, AppointmentDraft } from '../models/appointment.model';
+import { Appointment, AppointmentDraft, SERVICE_OPTIONS } from '../models/appointment.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentStoreService {
   private readonly appointmentsSignal = signal<Appointment[]>([]);
+  private readonly serviceTypesSignal = signal<string[]>([...SERVICE_OPTIONS]);
   private readonly syncErrorSignal = signal('');
   private readonly firestore: Firestore | null = null;
 
@@ -31,6 +32,8 @@ export class AppointmentStoreService {
     const app = getApps().length > 0 ? getApp() : initializeApp(FIREBASE_CONFIG);
     this.firestore = getFirestore(app);
     this.bindAppointments();
+    this.bindServiceTypes();
+    void this.ensureDefaultServiceTypes();
   }
 
   public listSorted(): Appointment[] {
@@ -41,6 +44,30 @@ export class AppointmentStoreService {
 
   public getSyncError(): string {
     return this.syncErrorSignal();
+  }
+
+  public listServiceTypes(): string[] {
+    return [...this.serviceTypesSignal()];
+  }
+
+  public async createServiceType(name: string): Promise<boolean> {
+    this.assertFirestoreConfigured();
+
+    const normalized = name.trim();
+    if (!normalized) {
+      return false;
+    }
+
+    const exists = this.serviceTypesSignal().some(
+      (serviceType) => serviceType.toLowerCase() === normalized.toLowerCase()
+    );
+    if (exists) {
+      return false;
+    }
+
+    const serviceTypeRef = doc(this.firestore!, 'serviceTypes', this.toServiceTypeId(normalized));
+    await setDoc(serviceTypeRef, { name: normalized }, { merge: true });
+    return true;
   }
 
   public hasConflict(dateTime: string, ignoredId: string | null = null): boolean {
@@ -97,6 +124,7 @@ export class AppointmentStoreService {
           nextState.push({
             id: snapshotDoc.id,
             name: data.name,
+            phone: typeof data.phone === 'string' ? data.phone : '',
             car: data.car,
             serviceType: data.serviceType,
             dateTime: data.dateTime
@@ -109,6 +137,39 @@ export class AppointmentStoreService {
         this.syncErrorSignal.set(this.getFirestoreErrorMessage(error));
       }
     );
+  }
+
+  private bindServiceTypes(): void {
+    const collectionRef = collection(this.firestore!, 'serviceTypes');
+
+    onSnapshot(
+      collectionRef,
+      (snapshot) => {
+        this.syncErrorSignal.set('');
+
+        const remoteServiceTypes = snapshot.docs
+          .map((snapshotDoc) => snapshotDoc.data())
+          .map((data) => data['name'])
+          .filter((name): name is string => typeof name === 'string')
+          .map((name) => name.trim())
+          .filter((name) => name.length > 0)
+          .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+        this.serviceTypesSignal.set(
+          remoteServiceTypes.length > 0 ? remoteServiceTypes : [...SERVICE_OPTIONS]
+        );
+      },
+      (error) => {
+        this.syncErrorSignal.set(this.getFirestoreErrorMessage(error));
+      }
+    );
+  }
+
+  private async ensureDefaultServiceTypes(): Promise<void> {
+    for (const serviceType of SERVICE_OPTIONS) {
+      const serviceTypeRef = doc(this.firestore!, 'serviceTypes', this.toServiceTypeId(serviceType));
+      await setDoc(serviceTypeRef, { name: serviceType }, { merge: true });
+    }
   }
 
   private assertFirestoreConfigured(): void {
@@ -132,6 +193,7 @@ export class AppointmentStoreService {
   private toDocument(payload: AppointmentDraft): AppointmentDraft {
     return {
       name: payload.name.trim(),
+      phone: payload.phone.trim(),
       car: payload.car.trim(),
       serviceType: payload.serviceType,
       dateTime: payload.dateTime
@@ -147,9 +209,19 @@ export class AppointmentStoreService {
 
     return (
       typeof candidate.name === 'string' &&
+      (typeof candidate.phone === 'string' || typeof (candidate as { phone?: unknown }).phone === 'undefined') &&
       typeof candidate.car === 'string' &&
       typeof candidate.serviceType === 'string' &&
       typeof candidate.dateTime === 'string'
     );
+  }
+
+  private toServiceTypeId(name: string): string {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
   }
 }

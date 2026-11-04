@@ -17,8 +17,10 @@
         [model]="form"
         [serviceOptions]="serviceOptions"
         [isEditing]="isEditing"
+        [isSaving]="isSaving"
         [formError]="formError"
         (addServiceType)="addServiceType($event)"
+        (phoneChange)="updatePhone($event)"
         (save)="saveAppointment()"
         (reset)="resetForm()"
       />

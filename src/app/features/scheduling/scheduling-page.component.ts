@@ -17,18 +17,18 @@ import { DayFilterComponent } from './components/day-filter/day-filter.component
   styleUrl: './scheduling-page.component.css'
 })
 export class SchedulingPageComponent {
-  protected serviceOptions = [...SERVICE_OPTIONS];
-
   protected readonly form: AppointmentDraft = {
     name: '',
+    phone: '',
     car: '',
-    serviceType: this.serviceOptions[0],
+    serviceType: SERVICE_OPTIONS[0],
     dateTime: ''
   };
 
   protected selectedDate = '';
   protected editingId: string | null = null;
   protected formError = '';
+  protected isSaving = false;
 
   private readonly store = inject(AppointmentStoreService);
 
@@ -38,6 +38,10 @@ export class SchedulingPageComponent {
 
   protected get sortedAppointments(): Appointment[] {
     return this.store.listSorted();
+  }
+
+  protected get serviceOptions(): string[] {
+    return this.store.listServiceTypes();
   }
 
   protected get availableDays(): string[] {
@@ -70,7 +74,7 @@ export class SchedulingPageComponent {
     return this.store.getSyncError();
   }
 
-  protected addServiceType(serviceTypeName: string): void {
+  protected async addServiceType(serviceTypeName: string): Promise<void> {
     const normalized = serviceTypeName.trim();
     if (!normalized) {
       return;
@@ -85,16 +89,35 @@ export class SchedulingPageComponent {
       return;
     }
 
-    this.serviceOptions = [...this.serviceOptions, normalized];
-    this.form.serviceType = normalized;
-    this.formError = '';
+    try {
+      const created = await this.store.createServiceType(normalized);
+      if (!created) {
+        this.formError = 'Esse tipo de servico ja existe.';
+        return;
+      }
+
+      this.form.serviceType = normalized;
+      this.formError = '';
+    } catch {
+      this.formError = 'Nao foi possivel salvar o tipo de servico no Firestore.';
+    }
   }
 
   protected async saveAppointment(): Promise<void> {
-    this.formError = '';
+    if (this.isSaving) {
+      return;
+    }
 
-    if (!this.form.name || !this.form.car || !this.form.serviceType || !this.form.dateTime) {
-      this.formError = 'Preencha todos os campos antes de salvar.';
+    this.formError = '';
+    const normalizedPhone = this.onlyDigits(this.form.phone);
+
+    if (!this.form.car || !this.form.serviceType || !this.form.dateTime) {
+      this.formError = 'Preencha carro, servico e data antes de salvar.';
+      return;
+    }
+
+    if (normalizedPhone.length > 0 && normalizedPhone.length < 10) {
+      this.formError = 'Se informar celular, preencha um numero valido.';
       return;
     }
 
@@ -105,9 +128,12 @@ export class SchedulingPageComponent {
     }
 
     try {
+      this.isSaving = true;
+
       if (this.editingId !== null) {
         const updated = await this.store.update(this.editingId, {
           ...this.form,
+          phone: this.formatPhone(normalizedPhone),
           dateTime: normalizedDateTime
         });
 
@@ -118,6 +144,7 @@ export class SchedulingPageComponent {
       } else {
         await this.store.create({
           ...this.form,
+          phone: this.formatPhone(normalizedPhone),
           dateTime: normalizedDateTime
         });
       }
@@ -127,12 +154,15 @@ export class SchedulingPageComponent {
     } catch {
       this.formError =
         'Nao foi possivel salvar no Firestore. Verifique as regras de permissao da colecao appointments.';
+    } finally {
+      this.isSaving = false;
     }
   }
 
   protected editAppointment(item: Appointment): void {
     this.editingId = item.id;
     this.form.name = item.name;
+    this.form.phone = item.phone || '';
     this.form.car = item.car;
     this.form.serviceType = item.serviceType;
     this.form.dateTime = item.dateTime;
@@ -140,6 +170,11 @@ export class SchedulingPageComponent {
   }
 
   protected async deleteAppointment(id: string): Promise<void> {
+    const confirmed = window.confirm('Deseja realmente excluir este agendamento?');
+    if (!confirmed) {
+      return;
+    }
+
     try {
       await this.store.remove(id);
 
@@ -170,10 +205,45 @@ export class SchedulingPageComponent {
   protected resetForm(): void {
     this.editingId = null;
     this.form.name = '';
+    this.form.phone = '';
     this.form.car = '';
-    this.form.serviceType = this.serviceOptions[0];
+    this.form.serviceType = this.serviceOptions[0] ?? SERVICE_OPTIONS[0];
     this.form.dateTime = '';
     this.formError = '';
+    this.isSaving = false;
+  }
+
+  protected updatePhone(maskedPhone: string): void {
+    this.form.phone = this.formatPhone(this.onlyDigits(maskedPhone));
+  }
+
+  private onlyDigits(value: string): string {
+    return value.replace(/\D/g, '');
+  }
+
+  private formatPhone(digits: string): string {
+    const normalizedDigits = digits.slice(0, 11);
+
+    if (!normalizedDigits) {
+      return '';
+    }
+
+    const ddd = normalizedDigits.slice(0, 2);
+    const remaining = normalizedDigits.slice(2);
+
+    if (normalizedDigits.length <= 2) {
+      return `(${ddd}`;
+    }
+
+    if (remaining.length <= 4) {
+      return `(${ddd}) ${remaining}`;
+    }
+
+    if (remaining.length <= 8) {
+      return `(${ddd}) ${remaining.slice(0, 4)}-${remaining.slice(4)}`;
+    }
+
+    return `(${ddd}) ${remaining.slice(0, 5)}-${remaining.slice(5)}`;
   }
 
   private toDateKey(dateTime: string): string {

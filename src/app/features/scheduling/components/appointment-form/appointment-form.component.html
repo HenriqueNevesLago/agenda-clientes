@@ -2,13 +2,24 @@
 
 <form (ngSubmit)="save.emit()" class="form-grid">
   <label>
-    Nome
+    Nome (opcional)
     <input
       type="text"
       name="name"
       [(ngModel)]="model.name"
       placeholder="Ex.: Maria Souza"
-      required
+    />
+  </label>
+
+  <label>
+    Celular (opcional)
+    <input
+      type="tel"
+      name="phone"
+      [ngModel]="model.phone"
+      (ngModelChange)="onPhoneInput($event)"
+      placeholder="(11) 91234-5678"
+      autocomplete="tel-national"
     />
   </label>
 
@@ -24,8 +35,13 @@
   </label>
 
   <label>
-    <span class="label-row">
-      Tipo de servico
+    Tipo de servico
+    <span class="service-select-row">
+      <select name="serviceType" [(ngModel)]="model.serviceType" required>
+        @for (service of serviceOptions; track service) {
+          <option [value]="service">{{ service }}</option>
+        }
+      </select>
       <button
         type="button"
         class="service-plus"
@@ -35,26 +51,22 @@
         +
       </button>
     </span>
+  </label>
 
-    @if (isAddingServiceType) {
-      <span class="service-editor">
-        <input
-          type="text"
-          name="newServiceType"
-          [(ngModel)]="newServiceTypeName"
-          placeholder="Novo tipo de servico"
-        />
+  @if (isAddingServiceType) {
+    <div class="service-editor">
+      <input
+        type="text"
+        name="newServiceType"
+        [(ngModel)]="newServiceTypeName"
+        placeholder="Novo tipo de servico"
+      />
+      <div class="service-editor-actions">
         <button type="button" class="ghost" (click)="confirmServiceType()">Adicionar</button>
         <button type="button" class="ghost" (click)="cancelServiceTypeEditor()">Cancelar</button>
-      </span>
-    }
-
-    <select name="serviceType" [(ngModel)]="model.serviceType" required>
-      @for (service of serviceOptions; track service) {
-        <option [value]="service">{{ service }}</option>
-      }
-    </select>
-  </label>
+      </div>
+    </div>
+  }
 
   <label>
     Data e hora
@@ -66,11 +78,11 @@
   }
 
   <div class="actions">
-    <button class="primary" type="submit">
-      {{ isEditing ? 'Salvar alteracao' : 'Agendar horario' }}
+    <button class="primary" type="submit" [disabled]="isSaving">
+      {{ isSaving ? (isEditing ? 'Salvando...' : 'Agendando...') : (isEditing ? 'Salvar alteracao' : 'Agendar horario') }}
     </button>
     @if (isEditing) {
-      <button type="button" class="ghost" (click)="reset.emit()">
+      <button type="button" class="ghost" (click)="reset.emit()" [disabled]="isSaving">
         Limpar
       </button>
     }

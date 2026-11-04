@@ -3,7 +3,8 @@
     <li>
       <div class="hour">{{ formatTime(item.dateTime) }}</div>
       <div class="card">
-        <p class="client">{{ item.name }}</p>
+        <p class="client">{{ item.name || 'Cliente sem nome' }}</p>
+        <p>{{ item.phone }}</p>
         <p>{{ item.car }}</p>
         <p>{{ item.serviceType }}</p>
         <small>{{ formatDateTime(item.dateTime) }}</small>

@@ -12,11 +12,13 @@ export class AppointmentFormComponent {
   @Input({ required: true }) public model!: AppointmentDraft;
   @Input({ required: true }) public serviceOptions: string[] = [];
   @Input() public isEditing = false;
+  @Input() public isSaving = false;
   @Input() public formError = '';
 
   @Output() public save = new EventEmitter<void>();
   @Output() public reset = new EventEmitter<void>();
   @Output() public addServiceType = new EventEmitter<string>();
+  @Output() public phoneChange = new EventEmitter<string>();
 
   protected isAddingServiceType = false;
   protected newServiceTypeName = '';
@@ -38,5 +40,9 @@ export class AppointmentFormComponent {
 
     this.addServiceType.emit(normalized);
     this.cancelServiceTypeEditor();
+  }
+
+  protected onPhoneInput(value: string): void {
+    this.phoneChange.emit(value);
   }
 }

@@ -20,28 +20,42 @@ label {
   color: #334055;
 }
 
-.label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
-
 .service-plus {
-  width: 1.55rem;
-  height: 1.55rem;
-  border-radius: 999px;
-  border: 1px solid #98badf;
-  background: #f3f8ff;
+  width: 2.2rem;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 10px;
+  border: 1px solid #9cb8d6;
+  background: linear-gradient(180deg, #f8fbff 0%, #e7f0fc 100%);
   color: #0f4e95;
   padding: 0;
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   line-height: 1;
   font-weight: 700;
 }
 
+.service-plus:hover {
+  border-color: #6f9cc9;
+}
+
+.service-select-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
 .service-editor {
   display: grid;
+  gap: 0.4rem;
+  background: #f8fbff;
+  border: 1px solid #d9e5f3;
+  border-radius: 10px;
+  padding: 0.55rem;
+}
+
+.service-editor-actions {
+  display: flex;
   gap: 0.4rem;
 }
 
@@ -57,6 +71,19 @@ select {
   border-radius: 10px;
   padding: 0.58rem 0.7rem;
   background: #fff;
+}
+
+select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #5c7392 50%),
+    linear-gradient(135deg, #5c7392 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) calc(50% - 3px),
+    calc(100% - 11px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.1rem;
 }
 
 input:focus,
@@ -76,6 +103,11 @@ button {
   border-radius: 10px;
   padding: 0.56rem 0.85rem;
   cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .primary {

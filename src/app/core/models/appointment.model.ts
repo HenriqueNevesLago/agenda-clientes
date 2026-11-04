@@ -1,6 +1,7 @@
 export interface Appointment {
   id: string;
   name: string;
+  phone: string;
   car: string;
   serviceType: string;
   dateTime: string;
@@ -8,6 +9,7 @@ export interface Appointment {
 
 export interface AppointmentDraft {
   name: string;
+  phone: string;
   car: string;
   serviceType: string;
   dateTime: string;
