@@ -75,15 +75,24 @@ h2 {
   }
 
   .form-panel {
-    order: 2;
+    order: 1;
   }
 
   .agenda-panel {
-    order: 1;
+    order: 2;
   }
 }
 
 @media (max-width: 580px) {
+  .shell {
+    padding: 1rem 0.8rem 1.1rem;
+  }
+
+  .panel {
+    border-radius: 14px;
+    padding: 0.9rem;
+  }
+
   .timeline li {
     grid-template-columns: 1fr;
   }

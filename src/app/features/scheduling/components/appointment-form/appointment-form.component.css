@@ -21,9 +21,9 @@ label {
 }
 
 .service-plus {
-  width: 2.2rem;
-  min-width: 2.2rem;
-  height: 2.2rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
   border-radius: 10px;
   border: 1px solid #9cb8d6;
   background: linear-gradient(180deg, #f8fbff 0%, #e7f0fc 100%);
@@ -77,7 +77,8 @@ textarea,
 select {
   border: 1px solid #cad7e3;
   border-radius: 10px;
-  padding: 0.58rem 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.62rem 0.75rem;
   background: #fff;
 }
 
@@ -115,7 +116,8 @@ select:focus {
 button {
   border: 0;
   border-radius: 10px;
-  padding: 0.56rem 0.85rem;
+  min-height: 2.75rem;
+  padding: 0.56rem 0.95rem;
   cursor: pointer;
 }
 
@@ -144,5 +146,18 @@ button:disabled {
 @media (max-width: 580px) {
   .date-time-row {
     grid-template-columns: 1fr;
+  }
+
+  .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0 calc(0.4rem + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, #ffffff00 0%, #ffffff 32%);
+  }
+
+  .primary {
+    flex: 1;
   }
 }
