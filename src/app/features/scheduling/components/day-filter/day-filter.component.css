@@ -1,0 +1,46 @@
+:host {
+  display: block;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.56rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.ghost {
+  background: #e9f2fb;
+  color: #1f4f86;
+}
+
+.day-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+  gap: 0.55rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.day-pill {
+  text-align: left;
+  background: #f2f7fc;
+  border: 1px solid #d7e5f3;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.day-pill strong {
+  font-size: 0.8rem;
+}
+
+.day-pill.active {
+  background: #1f7ddf;
+  color: #fff;
+  border-color: #1f7ddf;
+}

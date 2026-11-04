@@ -1,0 +1,17 @@
+<ul class="timeline">
+  @for (item of appointments; track trackById($index, item)) {
+    <li>
+      <div class="hour">{{ formatTime(item.dateTime) }}</div>
+      <div class="card">
+        <p class="client">{{ item.name }}</p>
+        <p>{{ item.car }}</p>
+        <p>{{ item.serviceType }}</p>
+        <small>{{ formatDateTime(item.dateTime) }}</small>
+        <div class="row-actions">
+          <button type="button" class="ghost" (click)="edit.emit(item)">Editar</button>
+          <button type="button" class="danger" (click)="remove.emit(item.id)">Excluir</button>
+        </div>
+      </div>
+    </li>
+  }
+</ul>

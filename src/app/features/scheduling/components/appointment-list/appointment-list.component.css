@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 0.56rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.ghost {
+  background: #e9f2fb;
+  color: #1f4f86;
+}
+
+.danger {
+  background: #ffe8e8;
+  color: #a12727;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.timeline li {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.hour {
+  font-weight: 700;
+  color: #1f5fa7;
+  margin-top: 0.55rem;
+}
+
+.card {
+  border: 1px solid #deebf7;
+  border-left: 5px solid #3284e4;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0.7rem;
+}
+
+.card p,
+.card small {
+  margin: 0;
+}
+
+.card p + p,
+.card p + small,
+.card small + .row-actions {
+  margin-top: 0.25rem;
+}
+
+.client {
+  font-weight: 700;
+  color: #1f2f48;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+@media (max-width: 580px) {
+  .timeline li {
+    grid-template-columns: 1fr;
+  }
+
+  .hour {
+    margin-top: 0;
+  }
+}

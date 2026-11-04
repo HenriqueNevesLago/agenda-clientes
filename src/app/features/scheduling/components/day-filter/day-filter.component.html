@@ -1,0 +1,19 @@
+<div class="header-actions">
+  @if (selectedDate) {
+    <button class="ghost" type="button" (click)="clearFilter.emit()">Ver todos os dias</button>
+  }
+</div>
+
+<div class="day-selector">
+  @for (day of availableDays; track day) {
+    <button
+      type="button"
+      class="day-pill"
+      [class.active]="selectedDate === day"
+      (click)="selectDay.emit(day)"
+    >
+      <span>{{ formatDay(day) }}</span>
+      <strong>{{ dayCounts[day] ?? 0 }} ag.</strong>
+    </button>
+  }
+</div>

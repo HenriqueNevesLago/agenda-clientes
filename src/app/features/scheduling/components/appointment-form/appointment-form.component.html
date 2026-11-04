@@ -1,0 +1,54 @@
+<h2>{{ isEditing ? 'Atualizar agendamento' : 'Novo agendamento' }}</h2>
+
+<form (ngSubmit)="save.emit()" class="form-grid">
+  <label>
+    Nome
+    <input
+      type="text"
+      name="name"
+      [(ngModel)]="model.name"
+      placeholder="Ex.: Maria Souza"
+      required
+    />
+  </label>
+
+  <label>
+    Carro
+    <input
+      type="text"
+      name="car"
+      [(ngModel)]="model.car"
+      placeholder="Ex.: Civic EXL 2021"
+      required
+    />
+  </label>
+
+  <label>
+    Tipo de servico
+    <select name="serviceType" [(ngModel)]="model.serviceType" required>
+      @for (service of serviceOptions; track service) {
+        <option [value]="service">{{ service }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    Data e hora
+    <input type="datetime-local" name="dateTime" [(ngModel)]="model.dateTime" required />
+  </label>
+
+  @if (formError) {
+    <p class="error">{{ formError }}</p>
+  }
+
+  <div class="actions">
+    <button class="primary" type="submit">
+      {{ isEditing ? 'Salvar alteracao' : 'Agendar horario' }}
+    </button>
+    @if (isEditing) {
+      <button type="button" class="ghost" (click)="reset.emit()">
+        Limpar
+      </button>
+    }
+  </div>
+</form>
