@@ -116,8 +116,8 @@ export class SchedulingPageComponent {
     this.formError = '';
     const normalizedPhone = this.onlyDigits(this.form.phone);
 
-    if (!this.form.car || !this.form.serviceType || !this.form.dateTime) {
-      this.formError = 'Preencha carro, serviço e data antes de salvar.';
+    if (!this.form.serviceType || !this.form.dateTime) {
+      this.formError = 'Preencha serviço e data antes de salvar.';
       return;
     }
 
