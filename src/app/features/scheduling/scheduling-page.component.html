@@ -3,16 +3,19 @@
     <p class="eyebrow">Painel de Atendimento</p>
     <h1>Agenda de Clientes</h1>
     <p>
-      Organize horários de serviço em uma agenda visual por dia. Dados salvos no
-      Firestore em tempo real.
+      Organize horários de serviço. Dados salvos em tempo real.
     </p>
+    <a class="history-link" routerLink="/historico">Consultar histórico</a>
     @if (backendError) {
       <p class="empty-state">{{ backendError }}</p>
     }
   </header>
 
   <section class="layout">
-    <article class="panel form-panel">
+    <article id="appointment-form-panel" class="panel form-panel">
+      @if (successMessage) {
+        <p class="success-message" role="status" aria-live="polite">{{ successMessage }}</p>
+      }
       <app-appointment-form
         [model]="form"
         [serviceOptions]="serviceOptions"

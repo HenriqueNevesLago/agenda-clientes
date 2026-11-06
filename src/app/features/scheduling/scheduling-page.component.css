@@ -43,6 +43,13 @@ h1 {
   color: #374156;
 }
 
+.history-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #155e63;
+  font-weight: 700;
+}
+
 .layout {
   display: grid;
   gap: 1rem;
@@ -67,6 +74,20 @@ h2 {
 .empty-state {
   margin: 1.2rem 0;
   color: #4c5f78;
+}
+
+.success-message {
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #a7d9bb;
+  border-radius: 8px;
+  background: #eaf7ef;
+  color: #155e37;
+  font-weight: 600;
+}
+
+#appointment-form-panel {
+  scroll-margin-top: 1rem;
 }
 
 @media (max-width: 960px) {

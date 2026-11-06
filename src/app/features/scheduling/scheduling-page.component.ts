@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   Appointment,
   AppointmentDraft,
@@ -12,7 +13,7 @@ import { DayFilterComponent } from './components/day-filter/day-filter.component
 
 @Component({
   selector: 'app-scheduling-page',
-  imports: [CommonModule, AppointmentFormComponent, DayFilterComponent, AppointmentListComponent],
+  imports: [CommonModule, RouterLink, AppointmentFormComponent, DayFilterComponent, AppointmentListComponent],
   templateUrl: './scheduling-page.component.html',
   styleUrl: './scheduling-page.component.css'
 })
@@ -29,6 +30,7 @@ export class SchedulingPageComponent {
   protected selectedDate = '';
   protected editingId: string | null = null;
   protected formError = '';
+  protected successMessage = '';
   private readonly savingSignal = signal(false);
 
   private readonly store = inject(AppointmentStoreService);
@@ -38,7 +40,10 @@ export class SchedulingPageComponent {
   }
 
   protected get sortedAppointments(): Appointment[] {
-    return this.store.listSorted();
+    const today = this.toDateKey(this.buildDefaultDateTime());
+    return this.store.listSorted().filter(
+      (item) => !item.completed && this.toDateKey(item.dateTime) >= today
+    );
   }
 
   protected get serviceOptions(): string[] {
@@ -133,6 +138,7 @@ export class SchedulingPageComponent {
     }
 
     const normalizedDateTime = this.form.dateTime;
+    const wasEditing = this.isEditing;
     if (this.store.hasConflict(normalizedDateTime, this.editingId)) {
       this.formError = 'Já existe um agendamento para esse horário.';
       return;
@@ -162,6 +168,9 @@ export class SchedulingPageComponent {
 
       this.selectedDate = this.toDateKey(normalizedDateTime);
       this.resetForm();
+      this.successMessage = !wasEditing
+        ? `Agendamento confirmado para ${this.formatConfirmationDate(normalizedDateTime)}.`
+        : `Agendamento atualizado para ${this.formatConfirmationDate(normalizedDateTime)}.`;
     } catch {
       this.formError =
         'Não foi possível salvar no Firestore. Verifique as regras de permissão da coleção appointments.';
@@ -172,6 +181,7 @@ export class SchedulingPageComponent {
 
   protected editAppointment(item: Appointment): void {
     this.editingId = item.id;
+    this.successMessage = '';
     this.form.name = item.name;
     this.form.phone = item.phone || '';
     this.form.note = item.note || '';
@@ -179,6 +189,10 @@ export class SchedulingPageComponent {
     this.form.serviceType = item.serviceType;
     this.form.dateTime = item.dateTime;
     this.formError = '';
+    document.getElementById('appointment-form-panel')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
   }
 
   protected async deleteAppointment(id: string): Promise<void> {
@@ -228,6 +242,7 @@ export class SchedulingPageComponent {
 
   protected resetForm(): void {
     this.editingId = null;
+    this.successMessage = '';
     this.form.name = '';
     this.form.phone = '';
     this.form.note = '';
@@ -327,5 +342,11 @@ export class SchedulingPageComponent {
 
   private toDateKey(dateTime: string): string {
     return dateTime.split('T')[0];
+  }
+
+  private formatConfirmationDate(dateTime: string): string {
+    const [date, time] = dateTime.split('T');
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year} às ${time}`;
   }
 }

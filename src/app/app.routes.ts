@@ -5,5 +5,12 @@ export const routes: Routes = [
 	{
 		path: '',
 		component: SchedulingPageComponent
+	},
+	{
+		path: 'historico',
+		loadComponent: () =>
+			import('./features/scheduling/appointment-history-page.component').then(
+				(module) => module.AppointmentHistoryPageComponent
+			)
 	}
 ];

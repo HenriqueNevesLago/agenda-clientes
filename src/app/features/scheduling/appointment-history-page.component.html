@@ -1,0 +1,39 @@
+<main class="history-shell">
+  <header class="history-header">
+    <div>
+      <p class="eyebrow">Consulta</p>
+      <h1>Histórico de agendamentos</h1>
+      <p>Agendamentos anteriores e atendimentos concluídos.</p>
+    </div>
+    <a routerLink="/">Voltar para agenda</a>
+  </header>
+
+  @if (appointments.length === 0) {
+    <p class="empty-state">Ainda não há agendamentos no histórico.</p>
+  } @else {
+    <ul class="history-list">
+      @for (item of appointments; track item.id) {
+        <li class="history-item">
+          <div class="history-date">{{ formatDateTime(item.dateTime) }}</div>
+          <div class="history-details">
+            <div class="history-title-row">
+              <h2>{{ item.name || 'Cliente sem nome' }}</h2>
+              @if (item.completed) {
+                <span class="completed-tag">Concluído</span>
+              } @else {
+                <span class="past-tag">Passado</span>
+              }
+            </div>
+            <p>{{ item.serviceType }} · {{ item.car }}</p>
+            @if (item.phone) {
+              <p>{{ item.phone }}</p>
+            }
+            @if (item.note) {
+              <p>{{ item.note }}</p>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</main>
